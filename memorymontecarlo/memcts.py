@@ -34,7 +34,5 @@ class Memcts():
                 Δ = 1
             backup_negamax(vi, Δ)
         if plot:
-            tre = toytree.tree(v0.context() + ";")
-            canvas, axes = tre.draw(width=300)
-            html.render(canvas, "C:/Users/Admin/Desktop/mcts/tree-plot.html")
+            v0.tree_draw()
         return best_child(v0, 0,silent=silent).action

@@ -5,13 +5,14 @@ from game.game import *
 from memorymontecarlo.memcts import Memcts
 from minmax.minimax import *
 from montecarlo.uct import uct
-
+from film.animate import *
 
 def calculate_pos(m, candidatos):
     tmp = [p for p in candidatos if m == p[1]]
     if len(tmp) == 0:
         return -1,-1
     b, a = tmp[0]
+    moveset.append([a,b])
     a, b = int((a + .5) * (ANCHO // TABLERO_ANCHO)), int((b + .5) * (ALTO // TABLERO_ALTO))
     return a, b
 
@@ -39,7 +40,7 @@ for i in range(TABLERO_ALTO):
         pygame.draw.circle(windowSurface, BLACK, (a, b), 20)
 pygame.display.update()
 
-
+moveset = []
 def draw_circle(t2, t, mcts_enable,color=RED):
     a, b = calculate_pos(t2, t.moves)
     pygame.draw.circle(windowSurface, color, (a, b), 20)
@@ -107,8 +108,9 @@ while True:
         if t.end:
             message_dissplay(f"Gano jugador {'AZUL' if t.winner==1 else 'ROJO'}")
             pygame.display.update()
-            sleep(5)
+            print(moveset)
+            game_drawing(moveset, "partida", TABLERO_ANCHO, TABLERO_ALTO)
+            sleep(2)
             pygame.quit()
             sys.exit()
-
 #print(t.winner)
