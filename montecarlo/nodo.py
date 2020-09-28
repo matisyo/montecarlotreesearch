@@ -20,7 +20,7 @@ class Nodo():
         xn = x + depth_dist
         yn = y + width
         for hijo in self.hijos:
-            yi = yn - width / self.splits * hijo[1]
+            yi = yn - width / self.splits * (hijo[1]+1)
             segments.append([[x, y], [xn, yi]])
             segments += self.hijos[hijo]._tree_draw( xn, yi, width / self.splits)
         return segments
@@ -35,6 +35,6 @@ class Nodo():
 
         fig, ax = plt.subplots(figsize=(9, 7))
         ax.set_xlim(-1, max([h for (_, _), (h, _) in segs]) + 1)
-        ax.set_ylim(-.5, 1.25 * width_dist)
+        ax.set_ylim(-.5, max([h for (_, _), (_, h) in segs]) + 1)
         ax.add_collection(line_segments)
         plt.show()

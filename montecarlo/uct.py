@@ -44,7 +44,7 @@ def expand(nodo):
     return n
 
 
-def best_child(nodo, c,silent=False):
+def best_child(nodo, c,silent=False,persist=False):
     assert (len(nodo.hijos) != 0)
     actual = -200
     bc = []
@@ -65,7 +65,10 @@ def best_child(nodo, c,silent=False):
         print(', '.join([x[1] for x in sorted(l,key=lambda t: t[0])]))
         print()
     assert (len(bc) != 0)
-    return sample(bc, 1)[0]
+    if persist:
+        return sample(bc, 1)[0],', '.join([x[1] for x in sorted(l, key=lambda t: t[0])])
+    else:
+        return sample(bc, 1)[0]
 
 
 def default_policy(state):

@@ -20,7 +20,7 @@ class Memcts():
         if not existia:
             print("Estado inaxesible")
 
-    def uct(self, n, plot=False,silent=False):
+    def uct(self, n, plot=False,silent=False,persist=False):
         v0 = self.root
         for t in range(n):
             vi = tree_policy(v0,silent=silent)
@@ -35,4 +35,7 @@ class Memcts():
             backup_negamax(vi, Δ)
         if plot:
             v0.tree_draw()
-        return best_child(v0, 0,silent=silent).action
+        if persist:
+            ct = best_child(v0, 0, silent=silent, persist=persist)
+            return ct[0].action, ct[1]
+        return best_child(v0, 0,silent=silent,persist=persist).action
