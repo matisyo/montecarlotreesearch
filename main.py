@@ -1,16 +1,18 @@
+from time import sleep
 import pygame, sys
 from pygame.locals import *
 from game.game import *
 from memorymontecarlo.memcts import Memcts
 from minmax.minimax import *
 from montecarlo.uct import uct
-
+from film.animate import *
 
 def calculate_pos(m, candidatos):
     tmp = [p for p in candidatos if m == p[1]]
     if len(tmp) == 0:
         return -1,-1
     b, a = tmp[0]
+    moveset.append([a,b])
     a, b = int((a + .5) * (ANCHO // TABLERO_ANCHO)), int((b + .5) * (ALTO // TABLERO_ALTO))
     return a, b
 
@@ -29,12 +31,6 @@ t = Connect4(TABLERO_ANCHO, TABLERO_ALTO, LARGO)
 windowSurface = pygame.display.set_mode((500, 400), 0, 32)
 windowSurface.fill(WHITE)
 
-PLAYER_1 = 1 #humano
-PLAYER_1 = 3 #MCTS
-PLAYER_2 = 1 #MINIMAX
-
-ai_prendida=True
-ai_mcts = True
 agente = MiniMax(t,4)
 agentemmc = Memcts(t)
 
@@ -44,83 +40,77 @@ for i in range(TABLERO_ALTO):
         pygame.draw.circle(windowSurface, BLACK, (a, b), 20)
 pygame.display.update()
 
-
-def draw_circle(t2, t, color=RED):
+moveset = []
+def draw_circle(t2, t, mcts_enable,color=RED):
     a, b = calculate_pos(t2, t.moves)
     pygame.draw.circle(windowSurface, color, (a, b), 20)
     t.move(t2)
     print(t2)
-    agentemmc.move(t2)
+    if mcts_enable:
+        agentemmc.move(t2)
     pygame.display.update()
 
-PLAYER_TURN = 1
+def draw_circle_player(t2, t, mcts_enable,color=RED):
+    a, b = calculate_pos(t2, t.moves)
+    tmp = [p for p in t.moves if t2 == p[1]]
+    if a == -1:
+        return
+    pygame.draw.circle(windowSurface, color, (a, b), 20)
+    t.move(t2)
+    if mcts_enable:
+        agentemmc.move(t2)
+    pygame.display.update()
+
+
+game_vars = {'PLAYER':1,'MCTS_ENABLE':True,'color':RED}
+def move_mcts(game_vars,event):
+    t2 = agentemmc.uct(150, plot=False)[1]
+    print(t2)
+    draw_circle(t2, t, game_vars['MCTS_ENABLE'],game_vars['color'])
+    game_vars['PLAYER'] = 1 if game_vars['PLAYER'] == 2 else 2
+
+def move_player(game_vars,event):
+    if event.type==MOUSEBUTTONDOWN:
+        jugador_nro = t.current_player
+        x, y = pygame.mouse.get_pos()
+        m = int(x // (ANCHO / TABLERO_ANCHO))
+        print(m)
+        draw_circle_player(m,t,game_vars['MCTS_ENABLE'],game_vars['color'])
+        game_vars['PLAYER'] = 1 if game_vars['PLAYER'] == 2 else 2
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, BLACK)
+    return textSurface, textSurface.get_rect()
+
+def message_dissplay(text):
+    largeText = pygame.font.Font("freesansbold.ttf", 25)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = ((ANCHO/2), (ALTO/2))
+    #TextRect.center = screen.get_rect().center
+    windowSurface.blit(TextSurf, TextRect)
+
+player_1 = move_mcts
+player_2 = move_player
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
 
-        if PLAYER_TURN==1 and not t.end:
-            color = BLUE
-            if PLAYER_1==1:
-                if event.type == MOUSEBUTTONDOWN and not t.end:
-                    jugador_nro = t.current_player
-                    x, y = pygame.mouse.get_pos()
-                    m = int(x // (ANCHO / TABLERO_ANCHO))
-                    a,b = calculate_pos(m, t.moves)
-                    tmp = [p for p in t.moves if m == p[1]]
-                    if a == -1:
-                        continue
-                    pygame.draw.circle(windowSurface, color, (a, b), 20)
-                    t.move(m)
-                    pygame.display.update()
-                    PLAYER_TURN = 2
-            elif PLAYER_1 == 2:
-                t2 = uct(t, 6000, plot=False)[1]
-                print(t2)
-                draw_circle(t2, t, color)
-                PLAYER_TURN=2
+        if game_vars['PLAYER'] == 1 and not t.end:
+            game_vars['color'] = BLUE
+            player_1(game_vars,event)
 
-            elif PLAYER_1 == 3:
-                t2 = agentemmc.uct(3000, plot=False)[1]
-                print(t2)
-                draw_circle(t2, t, color)
-                PLAYER_TURN=2
-            else:
-                t2 = agente.best_move()
-                print(t2)
-                draw_circle(t2, t, color)
-                PLAYER_TURN = 2
+        if game_vars['PLAYER'] == 2 and not t.end:
+            game_vars['color'] = RED
+            player_2(game_vars,event)
 
-            if PLAYER_TURN == 2 and not t.end:
-                color = RED
-                if PLAYER_2 == 1:
-                    if event.type == MOUSEBUTTONDOWN:
-                        jugador_nro = t.current_player
-                        x, y = pygame.mouse.get_pos()
-                        m = int(x // (ANCHO / TABLERO_ANCHO))
-                        a, b = calculate_pos(m, t.moves)
-                        tmp = [p for p in t.moves if m == p[1]]
-                        if a == -1:
-                            continue
-                        pygame.draw.circle(windowSurface, color, (a, b), 20)
-                        t.move(m)
-                        pygame.display.update()
-                        PLAYER_TURN = 1
-                elif PLAYER_2 == 2:
-                    t2 = uct(t, 3600, plot=False)[1]
-                    print(t2)
-                    draw_circle(t2, t, color)
-                    PLAYER_TURN = 1
-                elif PLAYER_2 == 3:
-                    t2 = agentemmc.uct(3000, plot=False)[1]
-                    print(t2)
-                    draw_circle(t2, t, color)
-                    PLAYER_TURN = 1
-                else:
-                    t2 = agente.best_move()
-                    print(t2)
-                    draw_circle(t2, t, color)
-                    PLAYER_TURN = 1
-
+        if t.end:
+            message_dissplay(f"Gano jugador {'AZUL' if t.winner==1 else 'ROJO'}")
+            pygame.display.update()
+            print(moveset)
+            game_drawing(moveset, "partida", TABLERO_ANCHO, TABLERO_ALTO)
+            sleep(2)
+            pygame.quit()
+            sys.exit()
 #print(t.winner)

@@ -55,7 +55,6 @@ def best_child(nodo, c,silent=False):
         score = h.q / h.n + c * (2 * np.log(nodo.n) / h.n) ** .5
         if cond:
             l.append((h.action[1],f"{h.action[1]} ({round(score,2)},{h.q},{h.n})"))
-            #print(, end=" ")
         if score == actual:
             bc.append(h)
         elif score > actual:
