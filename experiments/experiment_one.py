@@ -34,23 +34,23 @@ def minimax_vs_memcts(largo=4,alto=6,ancho=7,depth=4,iters=150,start=0,fname="ex
     return game_board.winner
 
 
-def memcts_vs_memcts(largo=4,alto=6,ancho=7,iters1=150,iters2=150,start=0,fname="experiment0",silent=True):
+def memcts_vs_memcts(largo=4,alto=6,ancho=7,iters1=150,iters2=150,start=0,fname="experiment0",silent=True,c1="best_child",fn1=None,c2="best_child",fn2=None):
 
     game_board = Connect4(ancho, alto, largo)
     agentemmc1 = Memcts(game_board)
     agentemmc2 = Memcts(game_board)
 
-    move = agentemmc1.uct(iters1, plot=False)[1]
-    move = agentemmc2.uct(iters2, plot=False)[1]
+    move = agentemmc1.uct(iters1, plot=False,criterion=c1,fn=fn1)[1]
+    move = agentemmc2.uct(iters2, plot=False,criterion=c2,fn=fn2)[1]
 
     moveset = []
     start_time = time.time()
     while not game_board.end:
         # your code
         if start == 0:
-            move = agentemmc1.uct(iters1, plot=False,silent=silent)[1]
+            move = agentemmc1.uct(iters1, plot=False,silent=silent,criterion=c1,fn=fn1)[1]
         else:
-            move = agentemmc2.uct(iters2, plot=False,silent=silent)[1]
+            move = agentemmc2.uct(iters2, plot=False,silent=silent,criterion=c2,fn=fn2)[1]
 
         tmp = [p for p in game_board.moves if move == p[1]]
         b, a = tmp[0]

@@ -20,7 +20,7 @@ class Memcts():
         if not existia:
             print("Estado inaxesible")
 
-    def uct(self, n, plot=False,silent=False,persist=False):
+    def uct(self, n, plot=False,silent=False,persist=False,criterion="best_child",fn=None):
         v0 = self.root
         for t in range(n):
             vi = tree_policy(v0,silent=silent)
@@ -38,4 +38,24 @@ class Memcts():
         if persist:
             ct = best_child(v0, 0, silent=silent, persist=persist)
             return ct[0].action, ct[1]
-        return best_child(v0, 0,silent=silent,persist=persist).action
+        if criterion == "best_child":
+            return best_child(v0, 0, silent=silent, persist=persist).action
+        return choose_child(v0, 0,fn).action
+
+
+from random import sample
+def choose_child(nodo, c,fn):
+    assert (len(nodo.hijos) != 0)
+    actual = -200
+    bc = []
+    for k in nodo.hijos:
+        h = nodo.hijos[k]
+        score = fn(h)
+        if score == actual:
+            bc.append(h)
+        elif score > actual:
+            actual = score
+            bc = [h]
+    assert(actual !=-200)
+    assert (len(bc) != 0)
+    return sample(bc, 1)[0]

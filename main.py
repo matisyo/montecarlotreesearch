@@ -22,17 +22,20 @@ WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 
-ALTO = 400
-ANCHO = 500
+INTELIGENCE=2000
+
 LARGO = 4
 TABLERO_ALTO = 6
 TABLERO_ANCHO = 7
+ALTO = TABLERO_ALTO*64#400
+ANCHO = TABLERO_ANCHO*64#500
 t = Connect4(TABLERO_ANCHO, TABLERO_ALTO, LARGO)
-windowSurface = pygame.display.set_mode((500, 400), 0, 32)
+windowSurface = pygame.display.set_mode((ANCHO, ALTO), 0, 32)
 windowSurface.fill(WHITE)
 
 agente = MiniMax(t,4)
 agentemmc = Memcts(t)
+t2 = agentemmc.uct(100, plot=False)[1]
 
 for i in range(TABLERO_ALTO):
     for j in range(TABLERO_ANCHO):
@@ -64,7 +67,7 @@ def draw_circle_player(t2, t, mcts_enable,color=RED):
 
 game_vars = {'PLAYER':1,'MCTS_ENABLE':True,'color':RED}
 def move_mcts(game_vars,event):
-    t2 = agentemmc.uct(150, plot=False)[1]
+    t2 = agentemmc.uct(INTELIGENCE, plot=False)[1]
     print(t2)
     draw_circle(t2, t, game_vars['MCTS_ENABLE'],game_vars['color'])
     game_vars['PLAYER'] = 1 if game_vars['PLAYER'] == 2 else 2
@@ -89,8 +92,8 @@ def message_dissplay(text):
     #TextRect.center = screen.get_rect().center
     windowSurface.blit(TextSurf, TextRect)
 
-player_1 = move_mcts
-player_2 = move_player
+player_2 = move_mcts
+player_1 = move_player
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:

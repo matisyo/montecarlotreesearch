@@ -1,4 +1,5 @@
-minimax,memcts_150,13,74,13
+minimax,memcts_150,13,13,74
+minimax,memcts_450,2,3,95
 memcts_150,memcts_150,5,50,45
 memcts_150,memcts_500,5,28,67
 memcts_500,memcts_500,4,52,44
@@ -8,4 +9,9 @@ memcts_1000,memcts_2000,5,40,55
 memcts_2000,memcts_1000,4,70,26
 memcts_2000,memcts_3000,4,49,47
 memcts_3000,memcts_2000,4,56,40
-
+memcts_300,memcts_300,1,5,9
+memcts_301,memcts_301,0,14,1
+memcts_302,memcts_302,0,6,9
+memcts_303,memcts_303,0,14,1
+memcts_299,memcts_299,1,9,5
+memcts_298,memcts_298,0,9,6
